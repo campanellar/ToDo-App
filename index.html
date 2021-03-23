@@ -5,16 +5,131 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="css/main.css">
-        <title>My VueJS app</title>
+        <title>ToDo App</title>
+        <script src="http://vuejs.org/js/vue.js"></script>
     </head>
     <body>
-        <div id="vueApp">
-            <h1 class="welcome">{{welcomeMessage}}</h1>
-            <input class="welcome" v-model="welcomeMessage" />
+        <div id="app">
+            <h1 v-text="title"></h1>
+            <h5>List</h5>
+            <ul v-for="list in lists" v-bind:key="list.id"> 
+              <li>{{list.item}} </li>
+            </ul>
+
+            <h5>List2</h5>
+            <ul v-for="todoItem in todoItems" v-bind:key="todo.id"> 
+              <li>{{todo.text}} </li>
+            </ul>
+
+            <input v-model="newItem" v-on:keyip.enter = 'addItem' />
+            <span><button @click.prevent="addItem">Add</button></span>
+            <input v-model="removeItem" v-on:keyip.enter = 'deleteItem' />
+            <span><button @click.prevent="removeItem">Remove</button></span>
+            <input v-model="markItem" v-on:keyip.enter = 'mark' />
+            <span><button @click.prevent="mark">Mark Completed</button></span>
+
+            <!------------------------------------------------------------------->
+            <label>Value: <input type="text" id="theValue"></label>
+            <input type="button" id="setValue" value="Set">
+
+            <script>
+              (function() {
+                // Use an input to show the current value and let
+                // the user set a new one
+                var input = document.getElementById("theValue");
+              
+                // Reading the value, which was store as "theValue"
+                if (localStorage && 'theValue' in localStorage) {
+                  input.value = localStorage.theValue;
+                }
+              
+                document.getElementById("setValue").onclick = function () {
+                  // Writing the value
+                  localStorage && (localStorage.theValue = input.value);
+                };
+              })();
+              </script>
+            <!------------------------------------------------------------------->
+
         </div>
+        <script type='text/JavaScript'>
 
+          new Vue({
+            el: "#app",
+            data: {
+              title: 'ToDo List',
+              
+              lists: [
+                { id:1, item: 'do homework', completed: false},
+                { id:2, item: 'do laundry', completed: false},
+                { id:3, item: 'empty trash', completed: false}
+              ],
+              //localStorage.setItem("lists", JSON.stringify(lists)),
+              newItem:'',
+              removeItem:-1,
+              markItem:-1,
 
-        <script src="js/vue.min.js"></script>
-        <script src="js/main.js"></script>
+              todoItems: []
+            },
+            mounted() {
+              if (localStorage.newItem) {
+                this.newItem = localStorage.newItem;
+              }
+            },
+            watch: {
+              newItem(item) {
+                localStorage.newItem = item;
+              }
+            },
+            methods: {
+              
+              addToDo(text) {
+                const todo = {
+                  text: localStorage.theValue,
+                  checked: false,
+                  id: this.lists.length+1,
+                }
+                this.todoItems.push(todo)
+              },
+              addItem(){
+                let idd = this.lists.length+1
+                const newList = {id:idd, item:this.newItem, completed:false}
+                this.lists.push(newList)
+
+                addToDo(this.newItem)
+
+                this.newItem = ''
+
+                /*this.lists = JSON.parse(localStorage.getItem("lists"));*/
+              },
+              deleteItem(){
+                //var n = this.lists[i].item.localeCompare(this.removeItem)
+                //let id = this.lists.length+1
+                //const newList = {id:id, item:this.removeItem}
+                //var index = lists.indexOf(newList)
+                //this.lists.splice(removeItem,1)
+
+                for (var i = 0; i < this.lists.length; i++) {
+                  if (this.lists[i].id === removeItem) 
+                    this.lists.splice(i, 1);
+                }
+              },
+              mark(){
+                for (var i = 0; i < this.lists.length; i++) {
+                  if (this.lists[i].id === markItem) {
+                    if (this.lists[i].completed)
+                      this.lists[i].completed = false
+                    else
+                      this.lists[i].completed = true
+                  }
+                }
+              }
+            }
+
+          })
+        
+        </script>
+        <!--<script src="js/vue.min.js"></script>
+        <script src="js/main.js"></script>-->
     </body>
 </html>
